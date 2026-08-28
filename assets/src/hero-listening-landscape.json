@@ -1,0 +1,8 @@
+{
+  "asset": "hero-listening-landscape.png",
+  "generated": "2026-08-28",
+  "generator": "Azure AI Foundry factory image deployment via /opt/fleet/lib/gen-image.sh",
+  "use_case": "stylized-concept",
+  "prompt": "Surreal editorial cut-paper landscape for a language listening practice web app. An impossible staircase made of four blank subtitle-paper strips rises through a midnight ink landscape, beginning beside a sculptural coral listening horn and ending at a quiet warm-paper moon. Sparse citron reeds and dusk-blue shadows, tactile torn cotton paper, screen-print grain, crisp collage edges, sophisticated magazine illustration, wide composition with generous calm negative space on the left, no text, no letters, no numbers, no people, no logos, no watermark, no interface, no gradients.",
+  "review": "Accepted: four distinct blank strips, clear listening horn and moon, no people, text artifacts, brands, watermarks, or unintended symbols."
+}

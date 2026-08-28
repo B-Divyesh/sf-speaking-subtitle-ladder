@@ -1,0 +1,12 @@
+{
+  "slug": "speaking-subtitle-ladder",
+  "title": "Subtitle Ladder",
+  "territory": "utilities",
+  "user": "Independent spoken-language learners who want repeatable listening-and-speaking practice that gradually removes translation support.",
+  "smallest_useful_product": "A PWA that accepts user-recorded or public-domain audio plus a caption file, creates 15–60 second loops, and offers translation, target-text, masked-word, and no-text stages with a spoken self-recording.",
+  "success_measure": "Half of pilots complete the same clip in three support levels and make at least five self-recordings in two weeks.",
+  "artifact_class": "pwa-offline",
+  "monetization": "one-time",
+  "constraints": "Only user-owned, licensed, or public-domain media; keep recordings local; captions require Unicode/RTL support; no fluency claims.",
+  "state": "RESEARCHED"
+}
