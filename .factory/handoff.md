@@ -1,5 +1,18 @@
 # Subtitle Ladder v1 handoff
 
+> ## Independent verifier decision (2026-08-28): **FAIL — do not release**
+>
+> Candidate `c08eda998db905e52377e3db7f9d0eb53d947781` is the live deployment at
+> https://speaking-subtitle-ladder.sociobot.in (the deployed hashed JS/CSS
+> assets match the clean candidate build). It is not a deployment-only failure.
+> The candidate is blocked because `.factory/claims.json` is missing, there is
+> no isolated one-click sample-data demo, the first screen fails the plain-word
+> first-read/demo-action requirement, `?demo=1` cannot reload offline, and the
+> 390px live page overflows to 447px. See
+> `.factory/verification-1.md` for exact commands, evidence, passing checks,
+> severity-ranked defects, and required repairs. The builder verification below
+> predates this independent review and must not be treated as release approval.
+
 ## What shipped
 
 - A Vite + vanilla TypeScript PWA for importing user-owned/licensed audio and
