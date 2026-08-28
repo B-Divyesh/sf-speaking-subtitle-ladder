@@ -1,41 +1,31 @@
 # Subtitle Ladder
 
-Subtitle Ladder is an installable, offline-first practice tool for independent
-spoken-language learners. Bring a short recording you own or may use plus SRT or
-WebVTT captions. The app makes 15–60 second loops and guides you through the same
-sound with progressively less support:
+Practise speaking with your own captions. Subtitle Ladder is for independent
+language learners who want to repeat one short audio clip with less text each
+time.
 
-1. translation;
-2. target-language text;
-3. masked words;
-4. no text.
+Try the ready German lesson at [the demo](/demo/). It opens with sample data in
+the isolated `demo:subtitle-ladder` browser database. Reset demo clears that
+sample database. Start for real clears it before returning to your separate library.
 
-At every rung you can record a spoken echo or retell. Audio, captions, progress,
-and recordings remain in browser storage. There is no speech score, automatic
-translation, content catalogue, or commercial-media downloader.
+The lesson has four rungs: translation, target text, masked words, and no text.
+You can make a microphone take and export a JSON backup. Audio and recordings
+are stored in this browser. The sample lesson works offline after its first
+visit. The $12 one-time unlimited option uses Sociobot checkout.
 
-Live product: <https://speaking-subtitle-ladder.sociobot.in>
+Claims and their browser regression tests are listed in
+`.factory/claims.json`. Demo details are in `.factory/demo.md`.
 
-## Who it is for
+## Run
 
-It is for learners who already have a legal source recording and want a small,
-repeatable listening-and-speaking routine instead of another course or subtitle
-browser. Unicode captions and explicit left-to-right/right-to-left controls are
-supported.
-
-## Run locally
-
-Requires Node.js 20 or later.
+Requires Node.js 20 or newer.
 
 ```sh
-npm install
+npm ci
 npm run dev
 ```
 
-Vite prints the local development URL. Microphone recording requires localhost or
-HTTPS and browser permission.
-
-## Test and build
+## Verify and build
 
 ```sh
 npm test
@@ -43,43 +33,15 @@ npm run build
 npm run test:e2e
 ```
 
-The exact deployment build command is `npm run build`. Static output lands in
-`dist/`, with `dist/index.html`, `dist/privacy/index.html`, and
-`dist/terms/index.html`. Playwright 1.58.2 is pinned; its Chromium browser is used
-for the end-to-end, microphone, axe accessibility, 390px mobile, and explicit
-offline tests.
-
-## Data and backups
-
-Projects and recordings are stored in IndexedDB. Settings and the optional
-Sociobot license token are stored in local storage. “Export backup” creates a JSON
-file containing all project metadata and local media blobs; “Import backup”
-restores it. Backups can be large because they include the learner’s audio.
-
-The free edition includes the complete method, two saved clips, ten recordings,
-offline use, and export/import. A $12 one-time license removes the count limits.
-Checkout and verification use the Sociobot billing API; no payment provider is
-embedded and no product ID is hardcoded. Override the billing origin for staging:
+Run every visitor-claim check with:
 
 ```sh
-VITE_BILLING_BASE=https://pilot-api.sociobot.in npm run build
+npm run test:claims -- --grep @claim:<id>
 ```
 
-## PWA behavior
+The static deployment command is `npm run build`. It writes `dist/`, with
+`dist/index.html` at its root. The product is a PWA and uses IndexedDB for
+projects and recordings. `/privacy/` and `/terms/` explain the local storage,
+license, and content-rights rules.
 
-The hand-written service worker precaches the versioned app shell and generated
-art, discovers Vite’s hashed JS/CSS assets, serves same-origin assets cache-first,
-and uses network-first navigation with an offline fallback. Updates are offered in
-an in-app toast rather than forcing an in-progress practice to reload.
-
-## Privacy and content rights
-
-There is no analytics, advertising, runtime CDN, third-party font, or media
-upload. Learners must use only audio and captions they created, own, licensed, or
-are otherwise permitted to use. See `/privacy/` and `/terms/` in the built app.
-
-## Project notes
-
-- Visual system and generated-image provenance: `.factory/design.md`
-- Build verification and known gaps: `.factory/handoff.md`
-- License: MIT
+License: [MIT](LICENSE).

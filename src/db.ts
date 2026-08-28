@@ -1,11 +1,16 @@
 import type { Project, Recording } from './types';
 
-const DB_NAME = 'subtitle-ladder';
+let dbName = 'subtitle-ladder';
 const DB_VERSION = 1;
+
+/** Keep the sample lesson physically separate from a learner's library. */
+export function useStorageNamespace(namespace: 'real' | 'demo'): void {
+  dbName = namespace === 'demo' ? 'demo:subtitle-ladder' : 'subtitle-ladder';
+}
 
 function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    const request = indexedDB.open(dbName, DB_VERSION);
     request.onupgradeneeded = () => {
       const db = request.result;
       if (!db.objectStoreNames.contains('projects')) db.createObjectStore('projects', { keyPath: 'id' });

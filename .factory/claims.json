@@ -1,0 +1,65 @@
+[
+  {
+    "id": "sample-demo",
+    "claim": "Try it with sample data opens a ready German listening lesson.",
+    "where": "landing action, demo page, README",
+    "test": "npm run test:claims -- --grep @claim:sample-demo",
+    "sandbox": "fresh browser context at /demo/; assert the sample loop, transcript, and reset action"
+  },
+  {
+    "id": "isolated-demo",
+    "claim": "Demo sample data is isolated from your real library.",
+    "where": "demo banner, demo documentation",
+    "test": "npm run test:claims -- --grep @claim:isolated-demo",
+    "sandbox": "open / then /demo/; assert separate subtitle-ladder and demo:subtitle-ladder IndexedDB databases"
+  },
+  {
+    "id": "four-rungs",
+    "claim": "The lesson moves through translation, target text, masked words, and no text.",
+    "where": "landing method, README",
+    "test": "npm run test:claims -- --grep @claim:four-rungs",
+    "sandbox": "fresh /demo/ context; complete each sample rung and assert the next named support level"
+  },
+  {
+    "id": "timed-loops",
+    "claim": "Imported audio and timed captions create a practice loop.",
+    "where": "setup screen, README",
+    "test": "npm run test:claims -- --grep @claim:timed-loops",
+    "sandbox": "fresh browser context; import a 20-second WAV and SRT captions, then assert the named clip opens in practice"
+  },
+  {
+    "id": "privacy-local",
+    "claim": "Audio and recordings are stored in this browser; the sample flow makes no third-party request.",
+    "where": "landing facts, privacy page, README",
+    "test": "npm run test:claims -- --grep @claim:privacy-local",
+    "sandbox": "fresh /demo/ context; intercept every request while progressing the lesson and assert same-origin only plus demo IndexedDB storage"
+  },
+  {
+    "id": "offline-reload",
+    "claim": "The sample lesson works offline after the first visit.",
+    "where": "landing facts, README",
+    "test": "npm run test:claims -- --grep @claim:offline-reload",
+    "sandbox": "fresh /demo/ context; wait for service-worker control, set the context offline, reload, and assert the sample lesson"
+  },
+  {
+    "id": "local-recording",
+    "claim": "You can save a microphone take for a lesson rung in this browser.",
+    "where": "practice screen, README",
+    "test": "npm run test:claims -- --grep @claim:local-recording",
+    "sandbox": "fresh /demo/ context with Playwright fake microphone; start and stop a take and assert it is listed"
+  },
+  {
+    "id": "export-backup",
+    "claim": "Export backup downloads a JSON copy of saved practice data.",
+    "where": "library action, README, privacy page",
+    "test": "npm run test:claims -- --grep @claim:export-backup",
+    "sandbox": "fresh browser context; request Export backup and assert the downloaded Subtitle Ladder JSON filename"
+  },
+  {
+    "id": "one-time-unlimited",
+    "claim": "$12 once offers unlimited local storage through Sociobot checkout.",
+    "where": "landing facts, upgrade page, terms, README",
+    "test": "npm run test:claims -- --grep @claim:one-time-unlimited",
+    "sandbox": "fresh browser context; open the upgrade page and assert the $12 once copy and Sociobot checkout URL"
+  }
+]

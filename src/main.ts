@@ -1,7 +1,8 @@
 import './styles.css';
 import { buildLoops, cueTextForLoop, formatTime, maskWords, parseCaptions, translationForLoop } from './captions';
-import { clearAllData, deleteProjectData, deleteRecording, listProjects, listRecordings, saveProject, saveRecording } from './db';
+import { clearAllData, deleteProjectData, deleteRecording, listProjects, listRecordings, saveProject, saveRecording, useStorageNamespace } from './db';
 import { cachedUnlock, captureLicenseFromUrl, checkoutUrl, hasLicense, saveLicense, verifyLicense } from './license';
+import { makeDemoProject } from './demo';
 import type { ExportBundle, Project, Recording } from './types';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
@@ -21,7 +22,6 @@ let view: 'home' | 'setup' | 'practice' | 'upgrade' = 'home';
 let loopIndex = 0;
 let stage = 0;
 let revealMasks = false;
-let unlocked = cachedUnlock();
 let mediaUrl = '';
 let recordingUrls: string[] = [];
 let recorder: MediaRecorder | null = null;
@@ -29,6 +29,12 @@ let recordingStream: MediaStream | null = null;
 let chunks: Blob[] = [];
 let statusMessage = '';
 let toastTimer = 0;
+const demoMode = location.pathname === '/demo' || location.pathname === '/demo/' || new URLSearchParams(location.search).get('demo') === '1';
+const storagePrefix = demoMode ? 'demo:' : '';
+const BUILD_ID = __BUILD_ID__;
+let unlocked = demoMode ? false : cachedUnlock();
+
+function localKey(key: string): string { return `${storagePrefix}${key}`; }
 
 const escapeHtml = (value: string) => value.replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character]!);
 
@@ -43,29 +49,30 @@ function icon(name: 'play' | 'pause' | 'record' | 'stop' | 'arrow' | 'download' 
 }
 
 function setTheme(theme: 'light' | 'dark' | 'system'): void {
-  localStorage.setItem('sl-theme', theme);
+  localStorage.setItem(localKey('sl-theme'), theme);
   document.documentElement.dataset.theme = theme;
 }
 
 function shell(content: string, page = 'app'): string {
   const offline = navigator.onLine ? '' : '<div class="offline-bar" role="status">Offline — your saved practice still works on this device.</div>';
-  return `${offline}
+  const demo = demoMode ? `<aside class="demo-banner" aria-label="Demo mode"><strong>Demo — sample data, nothing is saved.</strong><span>Explore the German listening loop.</span><button class="text-button" id="reset-demo">Reset demo</button><button class="button small secondary" id="start-real">Start for real</button></aside>` : '';
+  return `${offline}${demo}
     <header class="site-header">
       <a class="brand" href="/" aria-label="Subtitle Ladder home"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>Subtitle<br>Ladder</span></a>
-      ${page === 'app' ? `<nav aria-label="Primary"><button class="text-button" id="nav-home">My clips</button><button class="button small" id="nav-new">New clip</button></nav>` : '<a class="button small" href="/">Open the app</a>'}
+      ${page === 'app' ? `<nav aria-label="Primary"><a class="text-button" href="/demo/">Demo</a><button class="text-button" id="nav-home">My clips</button><button class="button small" id="nav-new">New clip</button></nav>` : '<a class="button small" href="/">Open the app</a>'}
     </header>
     ${content}
     <footer class="site-footer">
-      <p>Private by design. Audio and recordings stay on this device.</p>
+      <p>Audio and recordings are stored in this browser.</p>
       <nav aria-label="Footer"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><button class="link-button" id="theme-toggle">Change theme</button></nav>
-      <p class="fine-print">Original AI-generated welcome artwork · © 2026 Subtitle Ladder</p>
+      <p class="fine-print">Original AI-generated welcome artwork · Built by Param Factory · build ${escapeHtml(BUILD_ID)}</p>
     </footer>
     <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
     <div class="sr-only" id="announcer" aria-live="polite">${escapeHtml(statusMessage)}</div>`;
 }
 
 function renderHome(): void {
-  document.title = 'Subtitle Ladder — listen, speak, remove support';
+  document.title = 'Subtitle Ladder — practise with your own captions';
   const sorted = [...projects].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
   const library = sorted.length ? `
     <section class="library" aria-labelledby="library-title">
@@ -81,12 +88,12 @@ function renderHome(): void {
 
   app.innerHTML = shell(`<main id="main">
     <section class="hero">
-      <div class="hero-copy"><p class="eyebrow">Listening practice, one support at a time</p><h1>Hear it.<br><em>Then climb beyond</em><br>the subtitles.</h1><p class="lede">Turn your own short audio into a four-stage routine: translation, target text, masked words, then no text. Speak back at every rung.</p><div class="hero-actions"><button class="button" id="hero-create">Build a practice clip ${icon('arrow')}</button><button class="text-button" id="how-link">See the four rungs</button></div><p class="ownership">No upload. No speech score. Yours stays yours.</p></div>
+      <div class="hero-copy"><p class="eyebrow">Listening practice, one support at a time</p><h1>Practise speaking with your own captions.</h1><p class="lede">For independent language learners who want to hear one short clip, then speak it with less text.</p><div class="hero-actions"><a class="button" href="/demo/">Try it with sample data ${icon('arrow')}</a><span class="action-note">Open a ready German listening loop.</span><button class="text-button" id="hero-create">Use my audio</button><button class="text-button" id="how-link">See the four rungs</button></div><ul class="ownership"><li>Stored in this browser</li><li>Works offline after the first visit</li><li>$12 once for unlimited storage</li></ul></div>
       <picture class="hero-art"><source media="(max-width: 700px)" srcset="/hero-listening-landscape-768.webp"><img src="/hero-listening-landscape-1280.webp" width="1280" height="853" fetchpriority="high" alt="Four blank paper caption strips rise from a listening horn toward a moon."></picture>
     </section>
     ${library}
     <section class="method" id="method" aria-labelledby="method-title"><p class="eyebrow">The method</p><h2 id="method-title">The same sound. Less support.</h2><ol>${stages.map((item, index) => `<li><span>0${index + 1}</span><h3>${item.name}</h3><p>${item.note}</p></li>`).join('')}</ol></section>
-    <section class="paid-note"><div><p class="eyebrow">A calm, useful free version</p><h2>Two clips and ten recordings are free.</h2><p>Unlock unlimited local clips and recordings for <strong>$12 once</strong>. No subscription and no account required.</p></div><button class="button secondary" id="upgrade-link">${unlocked ? 'Unlimited is unlocked' : 'See the one-time unlock'}</button></section>
+    <section class="paid-note"><div><p class="eyebrow">Start with the full method</p><h2>Practice and backup export are free.</h2><p>Get unlimited local clips and recordings for <strong>$12 once</strong>.</p></div><button class="button secondary" id="upgrade-link">${unlocked ? 'Unlimited is unlocked' : 'See the one-time unlock'}</button></section>
   </main>`);
   bindCommon();
   document.querySelector('#hero-create')?.addEventListener('click', startSetup);
@@ -123,7 +130,7 @@ function renderSetup(): void {
 
 function renderPractice(): void {
   if (!project) return goHome();
-  document.title = `${project.title} — Subtitle Ladder`;
+  document.title = demoMode ? 'Demo — Subtitle Ladder' : `${project.title} — Subtitle Ladder`;
   const loop = project.loops[loopIndex];
   const target = cueTextForLoop(project.targetCues, loop);
   const translation = translationForLoop(project.translationCues, loop);
@@ -161,7 +168,7 @@ function renderPractice(): void {
 
 function renderUpgrade(): void {
   document.title = 'Unlimited unlock — Subtitle Ladder';
-  app.innerHTML = shell(`<main id="main" class="upgrade-page"><button class="back-button" id="upgrade-back">← Back</button><div class="upgrade-grid"><section><p class="eyebrow">One-time local unlock</p><h1>Keep every clip you want to climb.</h1><p class="lede">The free version includes the full four-rung method, two saved clips, ten recordings, offline use, and complete export. The unlimited unlock only removes the storage-count limits.</p><ul class="tick-list"><li>Unlimited local practice clips</li><li>Unlimited self-recordings</li><li>Every future local feature in this edition</li></ul></section><aside class="price-card"><p class="eyebrow">Subtitle Ladder unlimited</p><p class="price"><span>$</span>12 <small>USD · once</small></p><p>No subscription. Checkout is hosted by Sociobot/Dodo, the merchant of record. Refunds are handled there and revoke the license.</p>${unlocked ? '<div class="unlocked-note">✓ Unlimited is active on this device.</div>' : `<a class="button full" href="${checkoutUrl}">Buy the unlimited unlock ${icon('arrow')}</a>`}<details><summary>Have a license?</summary><form id="restore-form"><label for="license-token">Paste license token</label><input id="license-token" autocomplete="off" spellcheck="false" required><button class="button secondary small" type="submit">Verify & restore</button><p id="license-status" role="status"></p></form></details><p class="fine-print">By buying, you agree to the <a href="/terms/">terms</a>. Read the <a href="/privacy/">privacy policy</a>.</p></aside></div></main>`);
+  app.innerHTML = shell(`<main id="main" class="upgrade-page"><button class="back-button" id="upgrade-back">← Back</button><div class="upgrade-grid"><section><p class="eyebrow">One-time local unlock</p><h1>Keep every clip you want to climb.</h1><p class="lede">The free version includes the complete four-rung method and export. The unlimited unlock only removes local storage-count limits.</p><ul class="tick-list"><li>Unlimited local practice clips</li><li>Unlimited self-recordings</li><li>Every future local feature in this edition</li></ul></section><aside class="price-card"><p class="eyebrow">Subtitle Ladder unlimited</p><p class="price"><span>$</span>12 <small>USD · once</small></p><p>Checkout is hosted by Sociobot/Dodo, the merchant of record.</p>${unlocked ? '<div class="unlocked-note">✓ Unlimited is active on this device.</div>' : `<a class="button full" href="${checkoutUrl}">Buy the unlimited unlock ${icon('arrow')}</a>`}<details><summary>Have a license?</summary><form id="restore-form"><label for="license-token">Paste license token</label><input id="license-token" autocomplete="off" spellcheck="false" required><button class="button secondary small" type="submit">Verify & restore</button><p id="license-status" role="status"></p></form></details><p class="fine-print">By buying, you agree to the <a href="/terms/">terms</a>. Read the <a href="/privacy/">privacy policy</a>.</p></aside></div></main>`);
   bindCommon();
   document.querySelector('#upgrade-back')?.addEventListener('click', goHome);
   document.querySelector('#restore-form')?.addEventListener('submit', async (event) => {
@@ -178,7 +185,7 @@ function renderLegal(kind: 'privacy' | 'terms'): void {
   document.title = `${privacy ? 'Privacy' : 'Terms'} — Subtitle Ladder`;
   app.innerHTML = shell(`<main id="main" class="legal-page"><p class="eyebrow">Last updated 28 August 2026</p><h1>${privacy ? 'Privacy, in plain language.' : 'Terms of use.'}</h1>${privacy ? `
     <p class="lede">Subtitle Ladder is designed so your learning media does not need to leave your device.</p><h2>What stays local</h2><p>Your imported audio, captions, clip names, progress, settings, and microphone recordings are stored in your browser’s IndexedDB or local storage. They are not uploaded to us. Export happens only when you ask for a backup file.</p><h2>Payments and licenses</h2><p>If you buy the unlimited unlock, checkout is hosted by Sociobot/Dodo. They process payment and provide a license token. This app stores that token locally and sends it to the Sociobot license endpoint at most once per day to verify whether it is active. We do not receive or store your card details.</p><h2>Analytics and third parties</h2><p>This release has no analytics, advertising, tracking pixels, third-party fonts, or third-party runtime scripts. The generated welcome image ships inside the app.</p><h2>Your choices</h2><p>Use “Export backup” to take a copy of your data. Delete individual clips from the library, or clear all local data below. Removing browser site data also removes your practice and license from this device.</p><button class="button danger" id="clear-data">Clear all local practice data</button><h2>Contact</h2><p>For privacy questions, contact <a href="mailto:privacy@sociobot.in">privacy@sociobot.in</a>.</p>` : `
-    <p class="lede">Use Subtitle Ladder for honest, private practice with media you are allowed to use.</p><h2>Your media rights</h2><p>You may import only recordings and captions you created, own, licensed, or are permitted to use. Subtitle Ladder does not download, provide, or redistribute commercial media. You remain responsible for your source material.</p><h2>What the product provides</h2><p>The app creates timed listening loops, progressively removes text support, and lets you make local self-recordings. It does not translate, assess pronunciation, certify proficiency, or promise fluency. Caption timing and browser recording support can vary by file and device.</p><h2>Free and unlimited editions</h2><p>The free edition includes two saved clips and ten recordings. A $12 USD one-time purchase unlocks unlimited local clips and recordings for this edition. Sociobot/Dodo is the merchant of record. Refunds are handled through the merchant; a refunded, expired, revoked, or wrong-product license no longer unlocks paid features.</p><h2>Backups and availability</h2><p>Local browser storage can be erased by device settings or browser cleanup. Export backups regularly. The software is provided “as is” without warranties; use is at your own risk. We may update or discontinue hosted access, but exported data remains yours.</p><h2>Acceptable use and law</h2><p>Do not use the service to violate law or another person’s rights. These terms are governed by applicable law. If one provision cannot be enforced, the remaining provisions continue.</p><h2>Contact</h2><p>Questions can be sent to <a href="mailto:support@sociobot.in">support@sociobot.in</a>.</p>`}</main>`, 'legal');
+    <p class="lede">Use Subtitle Ladder for honest, private practice with media you are allowed to use.</p><h2>Your media rights</h2><p>You may import only recordings and captions you created, own, licensed, or are permitted to use. Subtitle Ladder does not download, provide, or redistribute commercial media. You remain responsible for your source material.</p><h2>What the product provides</h2><p>The app creates timed listening loops, progressively removes text support, and lets you make local self-recordings. It does not translate, assess pronunciation, certify proficiency, or promise fluency. Caption timing and browser recording support can vary by file and device.</p><h2>Free and unlimited editions</h2><p>A $12 USD one-time purchase unlocks unlimited local clips and recordings for this edition. Sociobot/Dodo is the merchant of record.</p><h2>Backups and availability</h2><p>Local browser storage can be erased by device settings or browser cleanup. Export backups regularly. The software is provided “as is” without warranties; use is at your own risk. We may update or discontinue hosted access, but exported data remains yours.</p><h2>Acceptable use and law</h2><p>Do not use the service to violate law or another person’s rights. These terms are governed by applicable law. If one provision cannot be enforced, the remaining provisions continue.</p><h2>Contact</h2><p>Questions can be sent to <a href="mailto:support@sociobot.in">support@sociobot.in</a>.</p>`}</main>`, 'legal');
   bindCommon();
   document.querySelector('#clear-data')?.addEventListener('click', async () => {
     if (!confirm('Clear every saved clip and recording from this browser? This cannot be undone unless you exported a backup.')) return;
@@ -196,9 +203,19 @@ function bindCommon(): void {
   document.querySelector('#nav-home')?.addEventListener('click', goHome);
   document.querySelector('#nav-new')?.addEventListener('click', startSetup);
   document.querySelector('#theme-toggle')?.addEventListener('click', () => {
-    const current = localStorage.getItem('sl-theme') || 'system';
+    const current = localStorage.getItem(localKey('sl-theme')) || 'system';
     const next = current === 'system' ? 'dark' : current === 'dark' ? 'light' : 'system';
     setTheme(next); showToast(`Theme: ${next}.`);
+  });
+  document.querySelector('#reset-demo')?.addEventListener('click', async () => {
+    await clearAllData();
+    await seedDemo();
+    showToast('Sample lesson reset.');
+    render();
+  });
+  document.querySelector('#start-real')?.addEventListener('click', async () => {
+    await clearAllData();
+    location.assign('/');
   });
 }
 
@@ -331,7 +348,7 @@ async function removeProject(id: string): Promise<void> {
   await deleteProjectData(id); projects = projects.filter((entry) => entry.id !== id); renderHome(); showToast('Clip and its recordings deleted.');
 }
 
-function startSetup(): void { if (!unlocked && projects.length >= FREE_PROJECTS) { view = 'upgrade'; } else view = 'setup'; render(); }
+function startSetup(): void { if (demoMode) { location.assign('/'); return; } if (!unlocked && projects.length >= FREE_PROJECTS) { view = 'upgrade'; } else view = 'setup'; render(); }
 function goHome(): void { if (recorder?.state === 'recording') recorder.stop(); project = null; view = 'home'; render(); }
 function prefersReducedMotion(): boolean { return matchMedia('(prefers-reduced-motion: reduce)').matches; }
 function formatBytes(bytes: number): string { return bytes < 1024 * 1024 ? `${Math.ceil(bytes / 1024)} KB` : `${(bytes / 1024 / 1024).toFixed(1)} MB`; }
@@ -368,11 +385,12 @@ async function importData(event: Event): Promise<void> {
 }
 
 async function init(): Promise<void> {
-  setTheme((localStorage.getItem('sl-theme') as 'light' | 'dark' | 'system') || 'system');
-  const arrivedWithLicense = captureLicenseFromUrl();
-  try { projects = await listProjects(); } catch { statusMessage = 'Local storage is unavailable. Check private browsing or storage settings.'; }
+  useStorageNamespace(demoMode ? 'demo' : 'real');
+  setTheme((localStorage.getItem(localKey('sl-theme')) as 'light' | 'dark' | 'system') || 'system');
+  const arrivedWithLicense = demoMode ? false : captureLicenseFromUrl();
+  try { projects = await listProjects(); if (demoMode) await seedDemo(); } catch { statusMessage = 'Local storage is unavailable. Check private browsing or storage settings.'; }
   render();
-  if (hasLicense()) {
+  if (!demoMode && hasLicense()) {
     try { const result = await verifyLicense(arrivedWithLicense); const wasUnlocked = unlocked; unlocked = result?.valid === true; if (arrivedWithLicense) { view = 'upgrade'; render(); showToast(unlocked ? 'Purchase restored. Unlimited is now active.' : 'This license is not active.'); } else if (wasUnlocked !== unlocked && view === 'home') renderHome(); }
     catch { if (arrivedWithLicense) showToast('Saved the license, but verification is offline. Try restoring it later.'); }
   }
@@ -381,16 +399,23 @@ async function init(): Promise<void> {
   registerServiceWorker();
 }
 
+async function seedDemo(): Promise<void> {
+  project = projects.find((item) => item.id === 'demo:morning-listening') || makeDemoProject();
+  if (!projects.some((item) => item.id === project!.id)) await saveProject(project);
+  projects = [project];
+  recordings = [];
+  setProjectMedia(project);
+  loopIndex = 0;
+  stage = 0;
+  view = 'practice';
+  statusMessage = 'Sample lesson ready.';
+}
+
 async function registerServiceWorker(): Promise<void> {
   if (!('serviceWorker' in navigator) || import.meta.env.DEV) return;
   try {
-    const registration = await navigator.serviceWorker.register('/sw.js');
+    const registration = await navigator.serviceWorker.register(`/sw.js?v=${encodeURIComponent(BUILD_ID)}`);
     await navigator.serviceWorker.ready;
-    const runtimeCache = await caches.open('subtitle-ladder-runtime-v1');
-    const localAssets = [...document.querySelectorAll<HTMLScriptElement | HTMLLinkElement | HTMLImageElement>('script[src],link[href],img[src]')]
-      .map((element) => 'src' in element ? element.src : element.href)
-      .filter((url) => new URL(url, location.href).origin === location.origin);
-    await Promise.allSettled(localAssets.map((url) => runtimeCache.add(url)));
     let refreshRequested = false;
     const offerUpdate = () => {
       const toast = document.querySelector<HTMLDivElement>('#toast'); if (!toast) return;

@@ -1,90 +1,78 @@
-# Subtitle Ladder v1 handoff
+# Subtitle Ladder repair handoff
 
-> ## Independent verifier decision (2026-08-28): **FAIL — do not release**
->
-> Candidate `c08eda998db905e52377e3db7f9d0eb53d947781` is the live deployment at
-> https://speaking-subtitle-ladder.sociobot.in (the deployed hashed JS/CSS
-> assets match the clean candidate build). It is not a deployment-only failure.
-> The candidate is blocked because `.factory/claims.json` is missing, there is
-> no isolated one-click sample-data demo, the first screen fails the plain-word
-> first-read/demo-action requirement, `?demo=1` cannot reload offline, and the
-> 390px live page overflows to 447px. See
-> `.factory/verification-1.md` for exact commands, evidence, passing checks,
-> severity-ranked defects, and required repairs. The builder verification below
-> predates this independent review and must not be treated as release approval.
+## Release decision
 
-## What shipped
+Repair complete for verifier report `d50c2ec30bf3928c631df61d0bf60596b30d8371`
+against candidate `c08eda998db905e52377e3db7f9d0eb53d947781`. The repair commit is recorded
+below after commit creation. The artifact remains a Vite + TypeScript static PWA
+and deploys from `dist/`.
 
-- A Vite + vanilla TypeScript PWA for importing user-owned/licensed audio and
-  UTF-8 SRT or WebVTT captions. Optional translation captions are aligned by
-  timestamp rather than requiring matching cue numbers.
-- Automatic caption-aware 15–60 second loops, with learner-editable boundaries,
-  playback rate, looping transport, elapsed progress, and keyboard shortcuts.
-- The complete four-rung routine: translation, target text, deterministic masked
-  words, and no text. Completion is stored per loop and stage.
-- Local microphone takes for every rung, with playback, persistence, and undoable
-  deletion. No speech scoring or fluency claims.
-- IndexedDB projects/media/recordings, JSON export/import including blobs, clip
-  deletion, total-data deletion, Unicode/RTL controls, light/dark/system themes,
-  responsive 390px layout, and explicit offline/update UI.
-- Installable manifest, 192/512 maskable icon, hand-written versioned service
-  worker, Vite asset discovery, network-first navigation, cache-first same-origin
-  assets, offline fallback, and opt-in update reload.
-- A useful free edition (two clips, ten recordings) plus a $12 one-time unlimited
-  unlock through the Sociobot checkout/license contract. No product IDs or payment
-  provider are embedded. Free method, export, accessibility, and safety behavior
-  are never gated.
-- Direct `/privacy/` and `/terms/` pages, MIT license, complete README, robots and
-  sitemap, and no analytics, external fonts, runtime CDNs, or media uploads.
-- Product-specific “listening landscape” visual system and an original generated
-  editorial hero. Source PNG, exact generator sidecar, human review, and provenance
-  are in `assets/src/` and `.factory/design.md`; shipped WebP derivatives are 28 KB
-  mobile and 74 KB desktop.
+## What changed
 
-## How to run and verify
+- Added `/demo/` and `/?demo=1`: a ready 20-second German sample lesson with
+  target and English captions, a persistent “Demo — sample data, nothing is
+  saved” banner, Reset demo, and Start for real.
+- Demo projects use `demo:subtitle-ladder`; real projects use
+  `subtitle-ladder`. Start for real clears demo data before returning to the
+  real library. `.factory/demo.md` documents the sample and namespace.
+- Added `.factory/claims.json` with nine observable claim checks. The claim
+  suite exercises sample data, demo isolation, all four rungs, local-only
+  requests, offline reload, microphone takes, JSON export, the $12 checkout,
+  and imported timed loops.
+- Rewrote the first screen around the job and first action: “Practise speaking
+  with your own captions,” a learner-specific sentence, visible sample action,
+  and short storage/offline/price facts. `.factory/copy-audit.md` records the
+  plain-words audit.
+- Repaired 390px layout overflow in both the welcome hero and the horizontal
+  practice ladder. The Playwright test asserts `scrollWidth <= clientWidth` on
+  landing and demo practice.
+- Reworked the service worker to use a build-ID cache name, fetch fresh shell
+  data during install, precache both demo URLs, and delete old cache versions.
+  A browser regression forces an update, verifies the fresh cache contains the
+  current bundle, then reloads the demo offline.
+- Added `staticwebapp.config.json` with CSP, Permissions-Policy, nosniff and
+  referrer headers, immutable hashed-asset caching, manifest media type, and a
+  styled 404 response override. Added `404.html`/`404.css` and route/config
+  regression coverage.
+- Added canonical URLs, demo sitemap entry, direct demo title, and Param
+  Factory/build footer metadata.
+
+## Run and deploy
 
 ```sh
-npm install
+npm ci
 npm test
 npm run build
+npm run test:claims -- --grep @claim:
 npm run test:e2e
+/opt/fleet/lib/deploy-static.sh speaking-subtitle-ladder dist
 ```
 
-Deployment command: `npm run build`
+The deployment output is `dist/` with `dist/index.html` at its root.
 
-Deployment root: `dist/` (contains `index.html` at its root)
+## Verification evidence (2026-08-28)
 
-Verification completed on 2026-08-28:
+- Clean install: `npm ci` — 60 packages, 0 vulnerabilities.
+- Unit/release configuration: `npm test` — 8 tests passed.
+- Production typecheck/build: `npm run build` — passed; JS 38.32 kB raw / 13.84
+  kB gzip, CSS 20.98 kB raw / 5.50 kB gzip.
+- Claim suite: `npm run test:claims -- --grep @claim:` — 9/9 passed.
+- Browser integration: `npm run test:e2e` — 13/13 passed. This includes desktop
+  normal import, 390px landing/demo overflow checks, keyboard focus, dark and
+  mobile Axe checks, reduced motion, same-origin privacy interception, query
+  demo offline reload, and service-worker update/offline regression.
+- Accessibility smoke check: `/opt/fleet/lib/verify-url.sh` against local
+  production preview — 200, no console errors, title/lang/one h1/main present,
+  0 images missing alt, and 0 unlabeled buttons. Playwright Axe found no
+  serious or critical findings on light, dark, and 390px screens.
+- `npm audit --audit-level=high` — 0 vulnerabilities.
+- Lighthouse 12.8.2 with Chromium 145 against `vite preview` — Performance
+  100, Accessibility 100, Best Practices 100, SEO 100; LCP 1.7 s, CLS 0.
 
-- `npm audit --audit-level=high`: 0 vulnerabilities.
-- `npm test`: 6/6 unit tests pass (SRT, WebVTT, malformed input, loop bounds,
-  short-audio rejection, Unicode masking).
-- `npm run build`: passes; initial JS 36.10 KB raw / 13.00 KB gzip, CSS 20.06 KB
-  raw / 5.31 KB gzip, no runtime font files.
-- `npm run test:e2e`: 3/3 Playwright tests pass with Chromium 145. The main test
-  imports a real generated WAV plus two SRT files, creates a project, completes a
-  rung, captures a fake-device microphone take through the real MediaRecorder API,
-  checks IndexedDB persistence, verifies zero console/page/network errors, and
-  reloads with `context.setOffline(true)` while retaining the saved clip.
-- Axe 4.10 in Playwright: 0 serious/critical findings on the light home screen,
-  dark home screen, and dark practice screen. Legal-route semantics and one-h1
-  checks pass. The 390×844 test has no horizontal overflow.
-- Lighthouse 12.8.2 against `vite preview`, mobile defaults: performance **100**,
-  accessibility **100**, best practices **100**, SEO **100**. FCP 1.0 s, LCP 1.6 s,
-  Speed Index 1.0 s, Total Blocking Time 0 ms, CLS 0. Lab Lighthouse does not
-  report INP; 0 ms TBT and the small event-driven UI are the available proxy.
+## Known notes
 
-## Known gaps and release notes
-
-- The factory still needs to register the product slug and price in the Sociobot
-  billing engine. Production builds default to `https://api.sociobot.in`; staging
-  can set `VITE_BILLING_BASE=https://pilot-api.sociobot.in`.
-- Subtitle Ladder intentionally does not download media, machine-translate text,
-  or score speech. Learners provide a translation caption track if they want the
-  first rung to show a translation.
-- Source-audio capture is not built into v1; recordings made in another recorder
-  can be imported, while in-app microphone capture is reserved for practice takes.
-- Supported import/recording codecs depend on the browser. The UI recommends MP3,
-  WAV, or M4A and gives repair guidance when metadata cannot be read.
-- Backups embed binary media as data URLs and can be large. A future version could
-  offer a streaming archive format without changing the local ownership model.
+- `vite preview` does not emulate Azure Static Web Apps response overrides;
+  `public/staticwebapp.config.json` is copied to `dist/` and is unit-tested for
+  the production CSP, cache, manifest, and 404 policy.
+- No identity provider is used, so a live identity-provider check is not
+  applicable. License verification remains the existing Sociobot flow.
