@@ -3,9 +3,9 @@
 ## Release decision
 
 Repair complete for verifier report `d50c2ec30bf3928c631df61d0bf60596b30d8371`
-against candidate `c08eda998db905e52377e3db7f9d0eb53d947781`. The repair commit is recorded
-below after commit creation. The artifact remains a Vite + TypeScript static PWA
-and deploys from `dist/`.
+against candidate `c08eda998db905e52377e3db7f9d0eb53d947781`. Repair commit:
+`47a123f1c44a45d6a441064dd082d059d090875a`. The artifact remains a Vite +
+TypeScript static PWA and deploys from `dist/`.
 
 ## What changed
 
