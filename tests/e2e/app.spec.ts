@@ -13,8 +13,12 @@ function silentWav(seconds = 20): Buffer {
 }
 
 test('creates a loop, climbs stages, records locally, and works offline', async ({ page, context }) => {
+  const consoleErrors: string[] = [];
+  page.on('console', (message) => { if (message.type() === 'error') consoleErrors.push(message.text()); });
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Hear it');
+  expect((await new AxeBuilder({ page }).analyze()).violations.filter((item) => ['serious', 'critical'].includes(item.impact || ''))).toEqual([]);
+  await page.getByRole('button', { name: 'Change theme' }).click();
   expect((await new AxeBuilder({ page }).analyze()).violations.filter((item) => ['serious', 'critical'].includes(item.impact || ''))).toEqual([]);
 
   await page.getByRole('button', { name: 'Build a practice clip' }).click();
@@ -69,6 +73,7 @@ test('creates a loop, climbs stages, records locally, and works offline', async 
   expect(offlineDiagnostic.appText, JSON.stringify(offlineDiagnostic)).toBeTruthy();
   await expect(page.getByText(/Offline — your saved practice/)).toBeVisible();
   await expect(page.getByText('German morning greeting')).toBeVisible();
+  expect(consoleErrors).toEqual([]);
 });
 
 test('legal pages are direct, semantic routes', async ({ page }) => {

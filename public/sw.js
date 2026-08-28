@@ -1,5 +1,5 @@
 const VERSION = 'subtitle-ladder-v1';
-const SHELL = ['/', '/index.html', '/privacy/', '/terms/', '/manifest.webmanifest', '/icon.svg', '/icons/icon-192.png', '/icons/icon-512.png', '/hero-listening-landscape-768.webp', '/hero-listening-landscape-1280.webp', '/offline.html'];
+const SHELL = ['/', '/index.html', '/privacy/', '/terms/', '/manifest.webmanifest', '/icon.svg', '/icons/icon-192.png', '/icons/icon-512.png', '/hero-listening-landscape-768.webp', '/hero-listening-landscape-1280.webp', '/offline.html', '/robots.txt'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(VERSION).then(async (cache) => {

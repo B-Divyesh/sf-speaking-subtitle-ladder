@@ -3,10 +3,28 @@
   "title": "Subtitle Ladder",
   "territory": "utilities",
   "user": "Independent spoken-language learners who want repeatable listening-and-speaking practice that gradually removes translation support.",
+  "evidence": [
+    {
+      "url": "https://hn.algolia.com/api/v1/items/42910934",
+      "date": "2025-02-02",
+      "quote_or_summary": "A learner seeking conversational German receives advice to use comprehensible input and a step-down sequence from target-audio/English subtitles to target subtitles to no subtitles."
+    },
+    {
+      "url": "https://github.com/ankidroid/Anki-Android/issues/18885",
+      "date": "2025-07-15",
+      "quote_or_summary": "AnkiDroid's current custom-study-by-tags UX work demonstrates that learners need narrower study subsets rather than one undifferentiated review queue."
+    }
+  ],
+  "recurrence": "A direct 2025 spoken-language request and a 2025 study-subset UX issue both point to the need to control difficulty and scope deliberately.",
+  "current_workaround": "Rewatch videos while manually changing subtitle settings, save timestamps in notes, or make separate decks by difficulty.",
+  "incumbents_and_gap": "Language Reactor and streaming subtitles help consume media; Anki schedules words. Neither is a local, repeatable ladder for a learner's own short licensed/public-domain clips and recordings.",
   "smallest_useful_product": "A PWA that accepts user-recorded or public-domain audio plus a caption file, creates 15–60 second loops, and offers translation, target-text, masked-word, and no-text stages with a spoken self-recording.",
   "success_measure": "Half of pilots complete the same clip in three support levels and make at least five self-recordings in two weeks.",
   "artifact_class": "pwa-offline",
   "monetization": "one-time",
   "constraints": "Only user-owned, licensed, or public-domain media; keep recordings local; captions require Unicode/RTL support; no fluency claims.",
+  "est_build_effort": "M",
+  "why_distinct": "It operationalizes a gradual support-removal practice routine rather than providing another course or subtitle browser extension.",
+  "confidence": 4,
   "state": "RESEARCHED"
 }
