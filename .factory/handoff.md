@@ -4,7 +4,8 @@
 
 Repair complete for verifier report `d50c2ec30bf3928c631df61d0bf60596b30d8371`
 against candidate `c08eda998db905e52377e3db7f9d0eb53d947781`. Repair commit:
-`47a123f1c44a45d6a441064dd082d059d090875a`. The artifact remains a Vite +
+`47a123f1c44a45d6a441064dd082d059d090875a`, followed by
+`e1b99e0` for the Azure webmanifest MIME mapping. The artifact remains a Vite
 TypeScript static PWA and deploys from `dist/`.
 
 ## What changed
@@ -68,6 +69,13 @@ The deployment output is `dist/` with `dist/index.html` at its root.
 - `npm audit --audit-level=high` — 0 vulnerabilities.
 - Lighthouse 12.8.2 with Chromium 145 against `vite preview` — Performance
   100, Accessibility 100, Best Practices 100, SEO 100; LCP 1.7 s, CLS 0.
+- Production deployment: Azure Static Web Apps deployment
+  `1bd8ba70-a480-4801-abb6-882ed8f3e34c` succeeded. Live
+  `https://speaking-subtitle-ladder.sociobot.in/` passed `verify-url.sh` with
+  no console errors. Live hashed JS has `max-age=31536000, immutable`, the
+  manifest returns `application/manifest+json`, required CSP/Permissions/
+  nosniff/referrer headers are present, and `/does-not-exist` returns the
+  styled page with HTTP 404.
 
 ## Known notes
 
