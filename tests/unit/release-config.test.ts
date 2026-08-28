@@ -6,6 +6,7 @@ describe('release configuration', () => {
     const config = JSON.parse(readFileSync('public/staticwebapp.config.json', 'utf8')) as {
       globalHeaders: Record<string, string>;
       routes: Array<{ route: string; headers?: Record<string, string> }>;
+      mimeTypes: Record<string, string>;
       responseOverrides: Record<string, { rewrite: string; statusCode: number }>;
     };
     expect(config.globalHeaders['Content-Security-Policy']).toContain("default-src 'self'");
@@ -13,6 +14,7 @@ describe('release configuration', () => {
     expect(config.globalHeaders['X-Content-Type-Options']).toBe('nosniff');
     expect(config.routes.find((route) => route.route === '/assets/*')?.headers?.['Cache-Control']).toContain('immutable');
     expect(config.routes.find((route) => route.route === '/manifest.webmanifest')?.headers?.['Content-Type']).toBe('application/manifest+json');
+    expect(config.mimeTypes['.webmanifest']).toBe('application/manifest+json');
     expect(config.responseOverrides['404']).toEqual({ rewrite: '/404.html', statusCode: 404 });
   });
 
