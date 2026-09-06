@@ -8,10 +8,16 @@ Try the ready German lesson at [the demo](/demo/). It opens with sample data in
 the isolated `demo:subtitle-ladder` browser database. Reset demo clears that
 sample database. Start for real clears it before returning to your separate library.
 
-The lesson has four rungs: translation, target text, masked words, and no text.
-You can make a microphone take and export a JSON backup. Audio and recordings
-are stored in this browser. The sample lesson works offline after its first
-visit. The $12 one-time unlimited option uses Sociobot checkout.
+Each loop has four support levels: translation, target text, masked words, and no text.
+Audio with UTF-8 SRT or WebVTT captions creates 15–60 second loops, including
+RTL text. Imported audio and microphone takes stay in browser storage during
+practice. The app does not send them to third parties. A JSON backup exports
+and restores clips, audio, progress, and takes.
+
+The free version stores up to two clips and ten microphone takes. A valid $12
+one-time license removes those app count limits. Device and browser storage
+limits still apply. Checkout and license checks use Sociobot. The sample lesson
+reloads offline after its first visit, and the app can be installed as a PWA.
 
 Claims and their browser regression tests are listed in
 `.factory/claims.json`. Demo details are in `.factory/demo.md`.
@@ -29,11 +35,12 @@ npm run dev
 
 ```sh
 npm test
-npm run build
 npm run test:e2e
+npm run build
 ```
 
-Run every visitor-claim check with:
+Each browser command builds its own production artifact. Run every
+visitor-claim check from a clean checkout with:
 
 ```sh
 npm run test:claims -- --grep @claim:<id>

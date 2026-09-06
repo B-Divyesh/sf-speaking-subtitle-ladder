@@ -12,6 +12,9 @@ export default defineConfig({
       input: {
         main: resolve(process.cwd(), 'index.html'),
         demo: resolve(process.cwd(), 'demo/index.html'),
+        newClip: resolve(process.cwd(), 'new/index.html'),
+        practice: resolve(process.cwd(), 'practice/index.html'),
+        unlimited: resolve(process.cwd(), 'unlimited/index.html'),
         privacy: resolve(process.cwd(), 'privacy/index.html'),
         terms: resolve(process.cwd(), 'terms/index.html')
       }

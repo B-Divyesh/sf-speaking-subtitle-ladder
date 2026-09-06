@@ -1,6 +1,6 @@
 const buildId = new URL(self.location.href).searchParams.get('v') || 'local';
 const VERSION = `subtitle-ladder-shell-${buildId}`;
-const SHELL = ['/', '/index.html', '/?demo=1', '/demo/', '/demo/index.html', '/privacy/', '/terms/', '/manifest.webmanifest', '/icon.svg', '/icons/icon-192.png', '/icons/icon-512.png', '/hero-listening-landscape-768.webp', '/hero-listening-landscape-1280.webp', '/offline.html', '/404.html', '/404.css', '/robots.txt', '/sitemap.xml'];
+const SHELL = ['/', '/index.html', '/?demo=1', '/demo/', '/demo/index.html', '/new/', '/practice/', '/unlimited/', '/privacy/', '/terms/', '/manifest.webmanifest', '/icon.svg', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/apple-touch-icon.png', '/hero-listening-landscape-768.webp', '/hero-listening-landscape-1280.webp', '/social-card.webp', '/offline.html', '/offline.css', '/404.html', '/404.css', '/robots.txt', '/sitemap.xml'];
 
 function freshPath(path) {
   const separator = path.includes('?') ? '&' : '?';

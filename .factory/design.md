@@ -114,6 +114,11 @@ and listening moon, then exported to PNG for the PWA manifest. No third-party
 visual assets or runtime font/CDN requests are used. The footer discloses that the
 welcome illustration is AI-generated.
 
+`public/social-card.webp` is a 1200×630 center crop of the original generated
+hero. `public/icons/apple-touch-icon.png` is a 180×180 derivative of the original
+hand-authored app icon. Both were produced locally on 6 September 2026; they add
+no new source imagery or license.
+
 ## Accessibility notes
 
 Focus uses a 3px blue outline with a 3px paper offset in light mode and a citron

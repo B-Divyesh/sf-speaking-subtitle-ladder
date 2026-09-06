@@ -1,65 +1,93 @@
 [
   {
     "id": "sample-demo",
-    "claim": "Try it with sample data opens a ready German listening lesson.",
+    "claim": "One click opens a ready German lesson, and Reset demo restores its starting level.",
     "where": "landing action, demo page, README",
     "test": "npm run test:claims -- --grep @claim:sample-demo",
-    "sandbox": "fresh browser context at /demo/; assert the sample loop, transcript, and reset action"
+    "sandbox": "fresh /demo/ context; change the sample, reset it, and assert the ready 20-second lesson returns"
   },
   {
     "id": "isolated-demo",
-    "claim": "Demo sample data is isolated from your real library.",
-    "where": "demo banner, demo documentation",
+    "claim": "Demo actions never read or change the real practice library.",
+    "where": "demo banner, demo documentation, README",
     "test": "npm run test:claims -- --grep @claim:isolated-demo",
-    "sandbox": "open / then /demo/; assert separate subtitle-ladder and demo:subtitle-ladder IndexedDB databases"
+    "sandbox": "seed real data, use and reset /demo/, return to real mode, and compare both IndexedDB namespaces"
   },
   {
     "id": "four-rungs",
-    "claim": "The lesson moves through translation, target text, masked words, and no text.",
-    "where": "landing method, README",
+    "claim": "Each loop has translation, target text, masked words, and no-text support levels.",
+    "where": "landing method, practice page, README",
     "test": "npm run test:claims -- --grep @claim:four-rungs",
-    "sandbox": "fresh /demo/ context; complete each sample rung and assert the next named support level"
+    "sandbox": "fresh /demo/ context; complete all four named levels and assert completion"
   },
   {
     "id": "timed-loops",
-    "claim": "Imported audio and timed captions create a practice loop.",
-    "where": "setup screen, README",
+    "claim": "Audio with UTF-8 SRT or WebVTT captions creates 15–60 second loops, including RTL text.",
+    "where": "setup page, terms, README",
     "test": "npm run test:claims -- --grep @claim:timed-loops",
-    "sandbox": "fresh browser context; import a 20-second WAV and SRT captions, then assert the named clip opens in practice"
+    "sandbox": "fresh real library; import SRT and Arabic RTL WebVTT projects and assert loop length and direction"
   },
   {
     "id": "privacy-local",
-    "claim": "Audio and recordings are stored in this browser; the sample flow makes no third-party request.",
-    "where": "landing facts, privacy page, README",
+    "claim": "Imported audio and microphone takes stay in browser storage and are not sent to third parties during practice.",
+    "where": "landing facts, setup, practice, privacy, README",
     "test": "npm run test:claims -- --grep @claim:privacy-local",
-    "sandbox": "fresh /demo/ context; intercept every request while progressing the lesson and assert same-origin only plus demo IndexedDB storage"
+    "sandbox": "import user audio, record a take, reload it from IndexedDB, and assert all requests remain same-origin"
   },
   {
     "id": "offline-reload",
-    "claim": "The sample lesson works offline after the first visit.",
-    "where": "landing facts, README",
+    "claim": "The sample lesson reloads offline after its first visit.",
+    "where": "landing facts, offline status, README",
     "test": "npm run test:claims -- --grep @claim:offline-reload",
-    "sandbox": "fresh /demo/ context; wait for service-worker control, set the context offline, reload, and assert the sample lesson"
+    "sandbox": "own fresh browser context; load /?demo=1, wait for control, go offline, reload, and assert the lesson"
   },
   {
     "id": "local-recording",
-    "claim": "You can save a microphone take for a lesson rung in this browser.",
-    "where": "practice screen, README",
+    "claim": "A microphone take can be saved and reopened for its lesson level.",
+    "where": "practice page, README",
     "test": "npm run test:claims -- --grep @claim:local-recording",
-    "sandbox": "fresh /demo/ context with Playwright fake microphone; start and stop a take and assert it is listed"
+    "sandbox": "fresh /demo/ context with fake microphone; save a take, reload, and assert it reopens"
   },
   {
-    "id": "export-backup",
-    "claim": "Export backup downloads a JSON copy of saved practice data.",
-    "where": "library action, README, privacy page",
-    "test": "npm run test:claims -- --grep @claim:export-backup",
-    "sandbox": "fresh browser context; request Export backup and assert the downloaded Subtitle Ladder JSON filename"
+    "id": "backup-roundtrip",
+    "claim": "A JSON backup exports and restores saved clips, audio, progress, and takes.",
+    "where": "library actions, privacy, terms, README",
+    "test": "npm run test:claims -- --grep @claim:backup-roundtrip",
+    "sandbox": "export a demo project with a take, block data-URL fetches, import into the real library, and reopen both media items"
+  },
+  {
+    "id": "free-limits",
+    "claim": "The free version stores up to two clips and ten microphone takes.",
+    "where": "landing paid section, unlimited page, terms, README",
+    "test": "npm run test:claims -- --grep @claim:free-limits",
+    "sandbox": "seed two clips and ten takes, then assert both next-create actions show the stated limit"
   },
   {
     "id": "one-time-unlimited",
-    "claim": "$12 once offers unlimited local storage through Sociobot checkout.",
-    "where": "landing facts, upgrade page, terms, README",
+    "claim": "A valid $12 one-time license removes the app's clip and take count limits.",
+    "where": "landing facts, unlimited page, terms, README",
     "test": "npm run test:claims -- --grep @claim:one-time-unlimited",
-    "sandbox": "fresh browser context; open the upgrade page and assert the $12 once copy and Sociobot checkout URL"
+    "sandbox": "fixture a valid Sociobot verification response, seed free limits, and create beyond both gates"
+  },
+  {
+    "id": "daily-license-check",
+    "claim": "A saved license is sent to Sociobot for verification at most once every 24 hours.",
+    "where": "privacy page",
+    "test": "npm run test:claims -- --grep @claim:daily-license-check",
+    "sandbox": "capture verification requests across arrival, navigation, and reload within 24 hours; assert one request"
+  },
+  {
+    "id": "delete-local-data",
+    "claim": "Clear all local practice data removes every saved clip and take after confirmation.",
+    "where": "privacy page",
+    "test": "npm run test:claims -- --grep @claim:delete-local-data",
+    "sandbox": "seed clips and takes, confirm deletion, and assert both IndexedDB stores are empty"
+  },
+  {
+    "id": "installable-pwa",
+    "claim": "Subtitle Ladder is an installable PWA.",
+    "where": "README",
+    "test": "npm run test:claims -- --grep @claim:installable-pwa",
+    "sandbox": "fresh demo context; load the linked standalone manifest and wait for the active service worker"
   }
 ]

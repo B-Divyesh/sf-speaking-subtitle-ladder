@@ -13,8 +13,9 @@ export default defineConfig({
     launchOptions: { args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'] }
   },
   webServer: {
-    command: 'npm run preview',
+    command: 'npm run build && npm run preview',
     port: 4173,
-    reuseExistingServer: true
+    reuseExistingServer: true,
+    timeout: 120_000
   }
 });
