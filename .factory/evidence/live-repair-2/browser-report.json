@@ -1,0 +1,88 @@
+{
+  "desktop": {
+    "title": "Subtitle Ladder — practise speaking with captions",
+    "job": "Practise speaking with your own captions.",
+    "audience": "For independent language learners who want to hear one short clip, then speak it with less text.",
+    "action": "Try it with sample data",
+    "actionAboveFold": true,
+    "h1Count": 1,
+    "main": true,
+    "demoLabelPersistent": true,
+    "demoReset": true,
+    "realProjectsBeforeExplicitImport": 0,
+    "backupRestored": true,
+    "thirdPartyPracticeRequests": [],
+    "writeRequests": []
+  },
+  "mobile": {
+    "job": "Practise speaking with your own captions.",
+    "audience": "For independent language learners who want to hear one short clip, then speak it with less text.",
+    "action": "Try it with sample data",
+    "actionAboveFold": true,
+    "noOverflow": true,
+    "demoLabelVisible": true
+  },
+  "offline": {
+    "lesson": "German morning reset",
+    "statusVisible": true
+  },
+  "routes": [
+    {
+      "path": "/",
+      "status": 200,
+      "title": "Subtitle Ladder — practise speaking with captions",
+      "h1": 1,
+      "main": 1
+    },
+    {
+      "path": "/demo/",
+      "status": 200,
+      "title": "Demo — Subtitle Ladder",
+      "h1": 1,
+      "main": 1
+    },
+    {
+      "path": "/new/",
+      "status": 200,
+      "title": "Create a practice clip — Subtitle Ladder",
+      "h1": 1,
+      "main": 1
+    },
+    {
+      "path": "/practice/",
+      "status": 200,
+      "title": "Subtitle Ladder — practise speaking with captions",
+      "h1": 1,
+      "main": 1
+    },
+    {
+      "path": "/unlimited/",
+      "status": 200,
+      "title": "Remove practice limits — Subtitle Ladder",
+      "h1": 1,
+      "main": 1
+    },
+    {
+      "path": "/privacy/",
+      "status": 200,
+      "title": "Privacy — Subtitle Ladder",
+      "h1": 1,
+      "main": 1
+    },
+    {
+      "path": "/terms/",
+      "status": 200,
+      "title": "Terms — Subtitle Ladder",
+      "h1": 1,
+      "main": 1
+    },
+    {
+      "path": "/repair-2-not-a-route",
+      "status": 404,
+      "title": "Page not found — Subtitle Ladder",
+      "h1": 1,
+      "main": 1
+    }
+  ],
+  "errors": []
+}
