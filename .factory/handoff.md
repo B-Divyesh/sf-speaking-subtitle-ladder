@@ -9,7 +9,7 @@ Verified 2026-09-06 against
 
 - Deployed implementation: `0d8fe1dc1e40031ffadbe21407706b52e7b086b7`
 - Deployment ID: `962c28f1-4692-48fd-964a-3edc34f8fb70`
-- Documentation/evidence commit: recorded by the report-only commit after this implementation
+- Documentation/evidence commit: `892fb3156efe46e299741c49c66f147f7aca03a5`
 - Previous failed candidate: `6c39c170bda106406a51b24de9384b15df436a92`
 
 The live footer reports build `0d8fe1d`, and the live CSS contains the final
