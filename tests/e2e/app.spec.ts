@@ -354,11 +354,12 @@ test('invalid audio, captions, and loop boundaries explain recovery', async ({ p
 
 test('demo rung hover contrast passes Axe in light and dark themes', async ({ page }) => {
   await openDemo(page);
-  const current = page.getByRole('button', { name: /Translation/ });
   for (const theme of ['light', 'dark']) {
     await page.evaluate((value) => { document.documentElement.dataset.theme = value; }, theme);
-    await current.hover();
-    expect(await seriousAxeViolations(page)).toEqual([]);
+    for (const name of [/Translation/, /Target text/]) {
+      await page.getByRole('button', { name }).hover();
+      expect(await seriousAxeViolations(page)).toEqual([]);
+    }
   }
 });
 
